@@ -1,13 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="BlackJackApplication.MainPage">
-    <HorizontalStackLayout>
+             x:Class="BlackJackApplication.MainPage"
+             BackgroundImageSource="mainbackground.png"
+             Shell.NavBarIsVisible="False">
+    <Grid RowDefinitions="*, 0.3*, *" ColumnDefinitions="*, 0.8*, *">
         <Button
-    x:Name="Play"
-    Text="Play" 
-    SemanticProperties.Hint="Starts the game"
-    Clicked="OnPlayClicked"
-    HorizontalOptions="Fill" />
-    </HorizontalStackLayout>
+                Grid.Row="1" 
+                Grid.Column="1"
+                x:Name="Play"
+                Text="Play" 
+                SemanticProperties.Hint="Starts the game"
+                Clicked="OnPlayClicked"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"/>
+    </Grid>
 </ContentPage>

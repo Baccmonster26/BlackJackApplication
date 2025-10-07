@@ -10,12 +10,12 @@ namespace BlackJackApplication
         public MainPage()
         {
             InitializeComponent();
-            NavigationPage.SetHasNavigationBar(this, false);   
+            Preferences.Default.Set("ChipCnt", 1000);
         }
 
-        private void OnPlayClicked(object sender, EventArgs e)
+        private async void OnPlayClicked(object sender, EventArgs e)
         {
-            _ = Navigation.PushAsync(new MainScreen());
+            await Navigation.PushAsync(new MainScreen());
         }
         
     }

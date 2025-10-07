@@ -30,7 +30,7 @@ namespace BlackJackApplication
         public bool MaxAce = false;
         public int HitCount = 0;
         public int DealerHitCount = 0;
-        public double ChipCnt = 1000;
+        public double ChipCnt = Preferences.Default.Get("ChipCnt", -1);
         public int Bet = 0;
         public MainScreen()
         {
@@ -40,9 +40,22 @@ namespace BlackJackApplication
 
         private async Task OnStartUp()
         {
-            ChipsLabel.Text = ChipCnt.ToString();
+            PlayedCardDeck = [.. CardDeck];
+            this.MaxAce = false;
+            this.PlayerCount = 0;
+            this.DealerCount = 0;
+            this.HitCount = 0;
+            this.DealerHitCount = 0;
+            this.ThirdCard.IsVisible = false;
+            this.FourthCard.IsVisible = false;
+            this.FiveCard.IsVisible = false;
+            this.DealerSecondCard.IsVisible = false;
+            this.DealerThirdCard.IsVisible = false;
+            this.DealerFourthCard.IsVisible = false;
+            this.DealerFiveCard.IsVisible = false;
+            ChipsLabel.Text = "Chips: \n" + ChipCnt.ToString();
             await TotalBet();
-            ChipsLabel.Text = ChipCnt.ToString();
+            ChipsLabel.Text = "Chips: \n" + ChipCnt.ToString();
 
             Random random = new();
 
@@ -140,12 +153,12 @@ namespace BlackJackApplication
             if (PlayerString == "ace" && MaxAce == false && DealerCount <= 10) { DealerCount += 11; MaxAce = true; } else if (PlayerString == "ace") { DealerCount += 1; }
             Debug.WriteLine("The Dealer Count: " + DealerCount);
             DealerSecondCard.Source = PlayingCard + ".png";
-            if (DealerCount == 21) { _ = DealerBlackJack(); DealerSecondCard.IsVisible = true; }
-            if (PlayerCount == 21) { _ = BlackJack(); }
+            if (DealerCount == 21) { await DealerBlackJack(); DealerSecondCard.IsVisible = true; }
+            else if (PlayerCount == 21) { await BlackJack(); }
 
         }
 
-        private void OnRandomCard(object sender, EventArgs e)
+        private async void OnRandomCard(object sender, EventArgs e)
         {
             Random random = new();
 
@@ -171,202 +184,172 @@ namespace BlackJackApplication
             {
                 ThirdCard.Source = PlayingCard + ".png";
                 ThirdCard.IsVisible = true;
+                HitCount++;
             }
-            if (HitCount == 1)
+            else if (HitCount == 1)
             {
                 FourthCard.Source = PlayingCard + ".png";
                 FourthCard.IsVisible = true;
+                HitCount++;
             }
-            if (HitCount == 2)
+            else if (HitCount == 2)
             {
                 FiveCard.Source = PlayingCard + ".png";
                 FiveCard.IsVisible = true;
+                HitCount++;
             }
             if (MaxAce && PlayerCount > 21)
             {
                 PlayerCount -= 10;
+                MaxAce = false;
             }
-            else if (PlayerCount > 21) { _ = Over21(); }
-            Debug.WriteLine("The Player Count: " + PlayerCount);
-            HitCount++;
+            else if (PlayerCount > 21) { await Over21(); }
         }
 
-        private void OnStand(object sender, EventArgs e)
+        private async void OnStand(object sender, EventArgs e)
         {
-            DealerTurn();
+            await DealerTurn();
         }
 
-        private void DealerTurn()
+        private async Task DealerTurn()
         {
             Random random = new();
 
             DealerSecondCard.IsVisible = true;
-
-            if (PlayerCount < 22 && PlayerCount == DealerCount && DealerCount < 22 && DealerCount >= 17) { _ = Draw(); }
-            else if (PlayerCount < 22 && PlayerCount > DealerCount && DealerCount < 22 && DealerCount >= 17) { _ = PlayerWon(); }
-            else if (PlayerCount < 22 && PlayerCount < DealerCount && DealerCount < 22 && DealerCount >= 17) { _ = DealerWon(); }
-            while (DealerCount < 17)
+            if (DealerCount < 17)
+            { 
+                while (DealerCount < 17)
+                {
+                    int index = random.Next(PlayedCardDeck.Count);
+                    var PlayingCard = PlayedCardDeck[index];
+                    PlayedCardDeck.RemoveAt(index);
+                    Debug.WriteLine(PlayingCard);
+                    Debug.WriteLine(PlayedCardDeck.Count);
+                    Debug.WriteLine(index);
+                    int underscoreIndex = PlayingCard.IndexOf('_');
+                    if (underscoreIndex != -1) { PlayerString = PlayingCard[..underscoreIndex]; }
+                    if (PlayerString == "ten" || PlayerString == "queen" || PlayerString == "king" || PlayerString == "jack") { DealerCount += 10; }
+                    if (PlayerString == "two") { DealerCount += 2; }
+                    if (PlayerString == "three") { DealerCount += 3; }
+                    if (PlayerString == "four") { DealerCount += 4; }
+                    if (PlayerString == "five") { DealerCount += 5; }
+                    if (PlayerString == "six") { DealerCount += 6; }
+                    if (PlayerString == "seven") { DealerCount += 7; }
+                    if (PlayerString == "eight") { DealerCount += 8; }
+                    if (PlayerString == "nine") { DealerCount += 9; }
+                    if (PlayerString == "ace" && MaxAce == false && DealerCount <= 10) { DealerCount += 11; MaxAce = true; } else if (PlayerString == "ace") { DealerCount += 1; }
+                    Debug.WriteLine("The Dealer Count: " + DealerCount);
+                    if (DealerHitCount == 0)
+                    {
+                        DealerThirdCard.Source = PlayingCard + ".png";
+                        DealerThirdCard.IsVisible = true;
+                        DealerHitCount++;
+                    }
+                    else if (DealerHitCount == 1)
+                    {
+                        DealerFourthCard.Source = PlayingCard + ".png";
+                        DealerFourthCard.IsVisible = true;
+                        DealerHitCount++;
+                    }
+                    else if (DealerHitCount == 2)
+                    {
+                        DealerFiveCard.Source = PlayingCard + ".png";
+                        DealerFiveCard.IsVisible = true;
+                        DealerHitCount++;
+                    }
+                    if (MaxAce && DealerCount > 21)
+                    {
+                        DealerCount -= 10;
+                        MaxAce = false;
+                    }
+                    else if (DealerCount > 21) { await DealerOver21(); }
+                    else if (PlayerCount < 22 && PlayerCount == DealerCount && DealerCount < 22 && DealerCount >= 17) { await Draw(); }
+                    else if (PlayerCount < 22 && PlayerCount > DealerCount && DealerCount < 22 && DealerCount >= 17) { await PlayerWon(); }
+                    else if (PlayerCount < 22 && PlayerCount < DealerCount && DealerCount < 22 && DealerCount >= 17) { await DealerWon(); }
+                }
+            }
+            else 
             {
-                int index = random.Next(PlayedCardDeck.Count);
-                var PlayingCard = PlayedCardDeck[index];
-                PlayedCardDeck.RemoveAt(index);
-                Debug.WriteLine(PlayingCard);
-                Debug.WriteLine(PlayedCardDeck.Count);
-                Debug.WriteLine(index);
-                int underscoreIndex = PlayingCard.IndexOf('_');
-                if (underscoreIndex != -1) { PlayerString = PlayingCard[..underscoreIndex]; }
-                if (PlayerString == "ten" || PlayerString == "queen" || PlayerString == "king" || PlayerString == "jack") { DealerCount += 10; }
-                if (PlayerString == "two") { DealerCount += 2; }
-                if (PlayerString == "three") { DealerCount += 3; }
-                if (PlayerString == "four") { DealerCount += 4; }
-                if (PlayerString == "five") { DealerCount += 5; }
-                if (PlayerString == "six") { DealerCount += 6; }
-                if (PlayerString == "seven") { DealerCount += 7; }
-                if (PlayerString == "eight") { DealerCount += 8; }
-                if (PlayerString == "nine") { DealerCount += 9; }
-                if (PlayerString == "ace" && MaxAce == false && DealerCount <= 10) { DealerCount += 11; MaxAce = true; } else if (PlayerString == "ace") { DealerCount += 1; }
-                Debug.WriteLine("The Dealer Count: " + DealerCount);
-                if (DealerHitCount == 0)
-                {
-                    DealerThirdCard.Source = PlayingCard + ".png";
-                    DealerThirdCard.IsVisible = true;
-                }
-                if (DealerHitCount == 1)
-                {
-                    DealerFourthCard.Source = PlayingCard + ".png";
-                    DealerFourthCard.IsVisible = true;
-                }
-                if (DealerHitCount == 2)
-                {
-                    DealerFiveCard.Source = PlayingCard + ".png";
-                    DealerFiveCard.IsVisible = true;
-                }
-                if (MaxAce && DealerCount > 21)
-                {
-                    DealerCount -= 10;
-                }
-                else if (DealerCount > 21) { _ = DealerOver21(); }
-                else if (PlayerCount < 22 && PlayerCount == DealerCount && DealerCount < 22 && DealerCount >= 17) { _ = Draw(); }
-                else if (PlayerCount < 22 && PlayerCount > DealerCount && DealerCount < 22 && DealerCount >= 17) { _ = PlayerWon(); }
-                else if (PlayerCount < 22 && PlayerCount < DealerCount && DealerCount < 22 && DealerCount >= 17) { _ = DealerWon(); }
-                DealerHitCount++;
+                if (PlayerCount < 22 && PlayerCount == DealerCount && DealerCount < 22 && DealerCount >= 17) { await Draw(); }
+                else if (PlayerCount < 22 && PlayerCount > DealerCount && DealerCount < 22 && DealerCount >= 17) { await PlayerWon(); }
+                else if (PlayerCount < 22 && PlayerCount < DealerCount && DealerCount < 22 && DealerCount >= 17) { await DealerWon(); }
             }
         }
 
         public async Task TotalBet()
         {
-            string result = await DisplayPromptAsync("Bet", "What's your bet?");
-            Bet = int.Parse(result);
-            ChipCnt += -Bet;
+            if (ChipCnt > 0)
+            {
+                string result = await DisplayPromptAsync("Bet", "What's your bet?");
+                if (string.IsNullOrWhiteSpace(result))
+                {
+                    await DisplayAlert("Invalid", "Please enter how many chips you are going to bet!", "Ok");
+                    await TotalBet();
+                }
+                else if (int.Parse(result) > ChipCnt)
+                {
+                    await DisplayAlert("Invalid", "You don't have that many chips, please only enter in chips you have!", "Ok");
+                    await TotalBet();
+                }
+                else
+                {
+                    Bet = int.Parse(result);
+                    ChipCnt -= Bet;
+                }
+
+
+            }
+            else
+            {
+                await DisplayAlert("You Ran Out Chips", "Out of Luck", "Quit");
+                Application.Current?.Quit();
+            }
         }
         public async Task BlackJack()
         {
             await DisplayAlert("BLACKJACK!!!!", "You have blackjack", "Ok");
-            MaxAce = false;
-            PlayerCount = 0;
-            DealerCount = 0;
-            ChipCnt += (Bet * 2.5);
-            ThirdCard.IsVisible = false;
-            FourthCard.IsVisible = false;
-            FiveCard.IsVisible = false;
-            DealerSecondCard.IsVisible = false;
-            DealerThirdCard.IsVisible = false;
-            DealerFourthCard.IsVisible = false;
-            DealerFiveCard.IsVisible = false;
-            await OnStartUp();
+            this.ChipCnt += (Bet * 2.5);
+            Preferences.Default.Set("ChipCnt", this.ChipCnt);
+            await Navigation.PushAsync(new MainScreen());
         }
         public async Task Over21()
         {
             await DisplayAlert("Game Over", "You went over 21 and lost the game", "OK");
-            MaxAce = false;
-            PlayerCount = 0;
-            DealerCount = 0;
-            ThirdCard.IsVisible = false;
-            FourthCard.IsVisible = false;
-            FiveCard.IsVisible = false;
-            DealerSecondCard.IsVisible = false;
-            DealerThirdCard.IsVisible = false;
-            DealerFourthCard.IsVisible = false;
-            DealerFiveCard.IsVisible = false;
-            await OnStartUp();
+            Preferences.Default.Set("ChipCnt", this.ChipCnt);
+            await Navigation.PushAsync(new MainScreen());
         }
         public async Task DealerBlackJack()
         {
             await DisplayAlert("Dealer hit BlackJack", "You lose", "Ok");
-            MaxAce = false;
-            PlayerCount = 0;
-            DealerCount = 0;
-            ThirdCard.IsVisible = false;
-            FourthCard.IsVisible = false;
-            FiveCard.IsVisible = false;
-            DealerSecondCard.IsVisible = false;
-            DealerThirdCard.IsVisible = false;
-            DealerFourthCard.IsVisible = false;
-            DealerFiveCard.IsVisible = false;
-            await OnStartUp();
+            Preferences.Default.Set("ChipCnt", this.ChipCnt);
+            await Navigation.PushAsync(new MainScreen());
         }
         public async Task DealerOver21()
         {
             await DisplayAlert("You Won!", "Dealer went over 21, you win!", "OK");
-            MaxAce = false;
-            PlayerCount = 0;
-            DealerCount = 0;
-            ChipCnt += (Bet * 2);
-            ThirdCard.IsVisible = false;
-            FourthCard.IsVisible = false;
-            FiveCard.IsVisible = false;
-            DealerSecondCard.IsVisible = false;
-            DealerThirdCard.IsVisible = false;
-            DealerFourthCard.IsVisible = false;
-            DealerFiveCard.IsVisible = false;
-            await OnStartUp();
+            this.ChipCnt += (Bet * 2);
+            Preferences.Default.Set("ChipCnt", this.ChipCnt);
+            await Navigation.PushAsync(new MainScreen());
         }
         public async Task DealerWon()
         {
             await DisplayAlert("Dealer Won", "Dealer had the closest number to 21 \nPlayer Count: " + PlayerCount + "\nDealer Count: " + DealerCount, "OK");
-            MaxAce = false;
-            PlayerCount = 0;
-            DealerCount = 0;
-            ThirdCard.IsVisible = false;
-            FourthCard.IsVisible = false;
-            FiveCard.IsVisible = false;
-            DealerSecondCard.IsVisible = false;
-            DealerThirdCard.IsVisible = false;
-            DealerFourthCard.IsVisible = false;
-            DealerFiveCard.IsVisible = false;
-            await OnStartUp();
+            Preferences.Default.Set("ChipCnt", this.ChipCnt);
+            await Navigation.PushAsync(new MainScreen());
         }
         public async Task PlayerWon()
         {
             await DisplayAlert("You Won!", "You had the closest number to 21 \nPlayer Count: " + PlayerCount + "\nDealer Count: " + DealerCount, "OK");
-            MaxAce = false;
-            PlayerCount = 0;
-            DealerCount = 0;
-            ChipCnt += (Bet * 2);
-            ThirdCard.IsVisible = false;
-            FourthCard.IsVisible = false;
-            FiveCard.IsVisible = false;
-            DealerSecondCard.IsVisible = false;
-            DealerThirdCard.IsVisible = false;
-            DealerFourthCard.IsVisible = false;
-            DealerFiveCard.IsVisible = false;
-            await OnStartUp();
+            this.ChipCnt += (Bet * 2);
+            Preferences.Default.Set("ChipCnt", this.ChipCnt);
+            await Navigation.PushAsync(new MainScreen());
         }
         public async Task Draw()
         {
             await DisplayAlert("Draw!!", "Dealer and Player had the same number", "OK");
-            MaxAce = false;
-            PlayerCount = 0;
-            DealerCount = 0;
-            ChipCnt += Bet;
-            ThirdCard.IsVisible = false;
-            FourthCard.IsVisible = false;
-            FiveCard.IsVisible = false;
-            DealerSecondCard.IsVisible = false;
-            DealerThirdCard.IsVisible = false;
-            DealerFourthCard.IsVisible = false;
-            DealerFiveCard.IsVisible = false;
-            await OnStartUp();
+            this.ChipCnt += Bet;
+            Preferences.Default.Set("ChipCnt", this.ChipCnt);
+            await Navigation.PushAsync(new MainScreen());
         }
     }
 }
