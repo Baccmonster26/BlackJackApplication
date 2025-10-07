@@ -10,7 +10,7 @@ namespace BlackJackApplication
         public MainPage()
         {
             InitializeComponent();
-            Preferences.Default.Set("ChipCnt", 1000);
+            Preferences.Default.Set("ChipCnt", "1000");
         }
 
         private async void OnPlayClicked(object sender, EventArgs e)

@@ -30,7 +30,8 @@ namespace BlackJackApplication
         public bool MaxAce = false;
         public int HitCount = 0;
         public int DealerHitCount = 0;
-        public double ChipCnt = Preferences.Default.Get("ChipCnt", -1);
+        public string strChipCnt = Preferences.Default.Get("ChipCnt", "-1");
+        public double ChipCnt = 0;
         public int Bet = 0;
         public MainScreen()
         {
@@ -53,6 +54,7 @@ namespace BlackJackApplication
             this.DealerThirdCard.IsVisible = false;
             this.DealerFourthCard.IsVisible = false;
             this.DealerFiveCard.IsVisible = false;
+            ChipCnt = int.Parse(strChipCnt);
             ChipsLabel.Text = "Chips: \n" + ChipCnt.ToString();
             await TotalBet();
             ChipsLabel.Text = "Chips: \n" + ChipCnt.ToString();
