@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace BlackJackApplication
@@ -348,10 +349,15 @@ namespace BlackJackApplication
         {
             if (ChipCnt > 0)
             {
-                string result = await DisplayPromptAsync("Bet", "What's your bet?");
-                if (string.IsNullOrWhiteSpace(result))
+                string result = await DisplayPromptAsync("Bet", "What's your bet?", "Bet", "Cancel");
+                if (string.IsNullOrWhiteSpace(result) )
                 {
                     await DisplayAlert("Invalid", "Please enter how many chips you are going to bet!", "Ok");
+                    await TotalBet();
+                }
+                else if (!result.All(char.IsDigit))
+                {
+                    await DisplayAlert("Invalid", "Please submit only numbers!", "Ok");
                     await TotalBet();
                 }
                 else if (int.Parse(result) > ChipCnt)
@@ -359,13 +365,16 @@ namespace BlackJackApplication
                     await DisplayAlert("Invalid", "You don't have that many chips, please only enter in chips you have!", "Ok");
                     await TotalBet();
                 }
-                else
+                else if (result != null)
                 {
                     Bet = int.Parse(result);
                     ChipCnt -= Bet;
                 }
-
-
+                else
+                {
+                    await DisplayAlert("Invalid", "Please enter how many chips you are going to bet!", "Ok");
+                    await TotalBet();
+                }
             }
             else
             {
