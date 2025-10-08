@@ -4,15 +4,27 @@
              x:Class="BlackJackApplication.MainPage"
              BackgroundImageSource="mainbackground.png"
              Shell.NavBarIsVisible="False">
+    <ContentPage.Resources>
+        <Style x:Key="MainButtonStyle" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="MediumVioletRed" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="CornerRadius" Value="20" />
+            <Setter Property="BorderColor" Value="DarkRed" />
+            <Setter Property="BorderWidth" Value="2" />
+            <Setter Property="Padding" Value="20,12" />
+            <Setter Property="FontAttributes" Value="Bold" />
+        </Style>
+    </ContentPage.Resources>
     <Grid RowDefinitions="*, 0.3*, *" ColumnDefinitions="*, 0.8*, *">
         <Button
-                Grid.Row="1" 
-                Grid.Column="1"
-                x:Name="Play"
-                Text="Play" 
-                SemanticProperties.Hint="Starts the game"
-                Clicked="OnPlayClicked"
-                HorizontalOptions="Center"
-                VerticalOptions="Center"/>
+            Style="{StaticResource MainButtonStyle}"
+            Grid.Row="1" 
+            Grid.Column="1"
+            x:Name="Play"
+            Text="Play" 
+            SemanticProperties.Hint="Starts the game"
+            Clicked="OnPlayClicked"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"/>
     </Grid>
 </ContentPage>

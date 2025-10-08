@@ -4,37 +4,82 @@
              x:Class="BlackJackApplication.MainScreen"
              BackgroundImageSource="blackjack_background.png"
              Shell.NavBarIsVisible="False">
-    <Grid RowDefinitions="*, 0.2*, *" ColumnDefinitions="*, *, *, *, *">
+    <ContentPage.Resources>
+        <Style x:Key="MainButtonStyle" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="MediumVioletRed" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="CornerRadius" Value="20" />
+            <Setter Property="BorderColor" Value="DarkRed" />
+            <Setter Property="BorderWidth" Value="2" />
+            <Setter Property="Padding" Value="20,12" />
+            <Setter Property="FontAttributes" Value="Bold" />
+        </Style>
+    </ContentPage.Resources>
+    <Grid RowDefinitions="*, 0.2*, *" ColumnDefinitions="*, *, *, *, *, *, *">
         <Image x:Name="DealerFirstCard" Source="red_joker.png" IsVisible="True" Aspect="AspectFit" Grid.Row="0" Grid.Column="0" />
         <Image x:Name="DealerSecondCard" Source="red_joker.png" IsVisible="False" Aspect="AspectFit" Grid.Row="0" Grid.Column="1" />
         <Image x:Name="DealerThirdCard" Source="red_joker.png" IsVisible="False" Aspect="AspectFit" Grid.Row="0" Grid.Column="2"/>
         <Image x:Name="DealerFourthCard" Source="red_joker.png" IsVisible="False" Aspect="AspectFit" Grid.Row="0" Grid.Column="3"/>
         <Image x:Name="DealerFiveCard" Source="red_joker.png" IsVisible="False" Aspect="AspectFit" Grid.Row="0" Grid.Column="4"/>
+        <Image x:Name="DealerSixthCard" Source="red_joker.png" IsVisible="False" Aspect="AspectFit" Grid.Row="0" Grid.Column="5"/>
+        <Image x:Name="DealerSeventhCard" Source="red_joker.png" IsVisible="False" Aspect="AspectFit" Grid.Row="0" Grid.Column="6"/>
         <Button
+            Style="{StaticResource MainButtonStyle}"
             x:Name="RandomCard"
             Text="Hit" 
             SemanticProperties.Hint="Get a random playing card"
             Clicked="OnRandomCard"
             Grid.Row="1"
-            Grid.Column="1"/>
+            Grid.Column="2"
+            MaximumWidthRequest="250"/>
         <Label x:Name="ChipsLabel"
             Text="" 
-            FontSize="24"
+            FontSize="48"
             HorizontalOptions="Center"
             VerticalOptions="Center"
             Grid.Row="1"
-            Grid.Column="2"/>
+            Grid.Column="1"
+            FontAttributes="Bold"/>
         <Button
+            Style="{StaticResource MainButtonStyle}"
             x:Name="Stand"
             Text="Stand"
             SemanticProperties.Hint="Lets you stand on a hand to potentially win"
             Clicked="OnStand"
             Grid.Row="1"
-            Grid.Column="3"/>
+            Grid.Column="4"
+            MaximumWidthRequest="250"/>
+        <Button
+            Style="{StaticResource MainButtonStyle}"
+            x:Name="DoubleDown"
+            Text="Double Down"
+            SemanticProperties.Hint="Lets you double down"
+            Clicked="OnDoubleDown"
+            Grid.Row="1"
+            Grid.Column="5"
+            MaximumWidthRequest="250"/>
+        <Label x:Name="DealerCntLabel"
+            Text="" 
+            FontSize="24"
+            HorizontalOptions="Center"
+            VerticalOptions="Start"
+            Grid.Row="1"
+            Grid.Column="3"
+            FontAttributes="Bold"/>
+        <Label x:Name="PlayerCntLabel"
+            Text="" 
+            FontSize="24"
+            HorizontalOptions="Center"
+            VerticalOptions="End"
+            Grid.Row="1"
+            Grid.Column="3"
+            FontAttributes="Bold"/>
         <Image x:Name="FirstCard" Source="red_joker.png" IsVisible="True" Aspect="AspectFit" Grid.Row="3" Grid.Column="0"/>
         <Image x:Name="SecondCard" Source="red_joker.png" IsVisible="True" Aspect="AspectFit" Grid.Row="3" Grid.Column="1"/>
         <Image x:Name="ThirdCard" Source="red_joker.png" IsVisible="False" Aspect="AspectFit" Grid.Row="3" Grid.Column="2"/>
         <Image x:Name="FourthCard" Source="red_joker.png" IsVisible="False" Aspect="AspectFit" Grid.Row="3" Grid.Column="3"/>
         <Image x:Name="FiveCard" Source="red_joker.png" IsVisible="False" Aspect="AspectFit" Grid.Row="3" Grid.Column="4"/>
+        <Image x:Name="SixthCard" Source="red_joker.png" IsVisible="False" Aspect="AspectFit" Grid.Row="0" Grid.Column="5"/>
+        <Image x:Name="SeventhCard" Source="red_joker.png" IsVisible="False" Aspect="AspectFit" Grid.Row="0" Grid.Column="6"/>
     </Grid>
 </ContentPage>
